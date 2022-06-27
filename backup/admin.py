@@ -1,33 +1,35 @@
 from email.headerregistry import Group
 from django.contrib import admin
+from django.db import models as mdl
+from django.forms import TextInput
 
 # Register your models here.
 
-from .models import Job, Repositories, Schedule
+from .models import Job, Repository
 
 
 class MembershipInline(admin.TabularInline):
-    model = Repositories.job.through
+    model = Repository.job.through
     extra = 1
 
 
 class RepositoriesInline(admin.ModelAdmin):
-    model = Repositories
+    model = Repository
     extra = 0
 
 
-class ScheduleAdmin(admin.StackedInline):
-    model =Schedule
-
 class JobAdmin(admin.ModelAdmin):
-    fieldsets = [
-        (None, {'fields': ['name', 'destination']}),
-    ]
+    model = Job
+    exclude = ['status', 'last_run']
+    list_display = ('name', 'destination',
+                     'date_created', 'last_run')
 
+    formfield_overrides = {
+        mdl.CharField: {'widget': TextInput(attrs={'size':'120'})},
+    }
 
-    inlines = [ScheduleAdmin, MembershipInline]
+    inlines = [MembershipInline]
 
 
 admin.site.register(Job, JobAdmin)
-admin.site.register(Schedule)
-admin.site.register(Repositories)
+admin.site.register(Repository)
