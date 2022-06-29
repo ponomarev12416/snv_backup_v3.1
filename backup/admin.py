@@ -2,10 +2,13 @@ from email.headerregistry import Group
 from django.contrib import admin
 from django.db import models as mdl
 from django.forms import TextInput
+from django.urls import path
+from django.template.response import TemplateResponse
 
 # Register your models here.
 
 from .models import Job, Repository
+
 
 
 class MembershipInline(admin.TabularInline):
@@ -14,8 +17,11 @@ class MembershipInline(admin.TabularInline):
 
 
 class RepositoriesInline(admin.ModelAdmin):
+    
     model = Repository
     extra = 0
+
+
 
 
 class JobAdmin(admin.ModelAdmin):
@@ -30,6 +36,22 @@ class JobAdmin(admin.ModelAdmin):
 
     inlines = [MembershipInline]
 
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        if change:
+            print('save_model')
+
+class RepositoryAdmin(admin.ModelAdmin):
+
+    list_display = ('name', 'path', 'modified')
+
+    def get_list_display(self, request):
+        print("ddddddsssssssssssssssssssssssssssssss")
+        return super().get_list_display(request)
+
+
+
+
 
 admin.site.register(Job, JobAdmin)
-admin.site.register(Repository)
+admin.site.register(Repository, RepositoryAdmin)

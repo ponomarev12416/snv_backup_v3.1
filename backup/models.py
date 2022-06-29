@@ -19,6 +19,7 @@ class Job(models.Model):
     SATURDAY = models.BooleanField()
     SUNDAY = models.BooleanField()
 
+
     
     def __str__(self):
         return self.name
@@ -31,12 +32,13 @@ class Job(models.Model):
 class Repository(models.Model):
     name = models.CharField(max_length=100, unique=True)
     path = models.CharField(max_length=250*3)
+    modified = models.DateTimeField('Modified time', auto_now=True, blank=True)
 
     job = models.ManyToManyField(Job, related_name='repositories', blank=True)
 
     def __str__(self):
-        return self.name
+        return f"{self.name} : {self.path}"
 
     def __repr__(self):
-        return self.name
+        return self.name 
 
