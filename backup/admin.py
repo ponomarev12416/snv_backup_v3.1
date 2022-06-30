@@ -38,8 +38,7 @@ class JobAdmin(admin.ModelAdmin):
 
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)
-        if change:
-            print('save_model')
+        
 
 class RepositoryAdmin(admin.ModelAdmin):
 

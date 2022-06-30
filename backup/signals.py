@@ -21,8 +21,17 @@ def add_task(arg):
     path_list = []
     for rep in job.repositories.all():
         path_list.append(rep.path)
-    print(path_list)
-    print(type(path_list))
-    import math
-    schedule('backup.utils.make_backups', job.destination, *path_list,
-             schedule_type=Schedule.CRON, cron='* * * * SUN,TUE')
+    days = job.get_days_cron_style()
+    hour = job.get_hours()
+    minutes = job.get_minutes()
+    
+    if job.schedule:
+        #x = Schedule.objects.get(pk=job.schedule.id)
+        schedule_ = schedule('backup.utils.make_backups', job.destination, *path_list,
+             schedule_type=Schedule.CRON, cron=f'{minutes} {hour} * * {days}')
+        Schedule.objects.filter(pk=job.schedule.id).update(schedule_)
+    else:
+        job.schedule = schedule('backup.utils.make_backups', job.destination, *path_list,
+             schedule_type=Schedule.CRON, cron=f'{minutes} {hour} * * {days}')
+        job.save()
+
