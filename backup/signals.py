@@ -20,9 +20,8 @@ def job_handler(sender, **kw):
     transaction.on_commit(lambda: add_task(job.id))
 
 
-def add_task(arg):
-    job: Job = Job.objects.get(pk=arg)
-    path_list = [rep.path for rep in job.repositories.all()]
+def add_task(job_id):
+    job: Job = Job.objects.get(pk=job_id)
     days = job.get_days_cron_style()
     hour, minutes = job.get_hours_and_minutes()
     # if job is already created and need to be updated

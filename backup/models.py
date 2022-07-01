@@ -26,13 +26,13 @@ class Job(models.Model):
         Schedule, on_delete=models.CASCADE, blank=True, null=True)
 
     def clean(self):
-        if not (self.monday 
-            or self.tuesday 
-            or self.wednesday
-            or self.thursday
-            or self.friday
-            or self.saturday
-            or self.sunday):
+        if not (self.monday
+                or self.tuesday
+                or self.wednesday
+                or self.thursday
+                or self.friday
+                or self.saturday
+                or self.sunday):
             raise ValidationError("One of the days must be chosen")
         if not self.time:
             raise ValidationError("Provide proper time")
@@ -73,12 +73,6 @@ class Job(models.Model):
         return self.name
 
 
-class CustomSchedule(Schedule):
-
-    class Meta:
-        proxy = True
-
-
 class Repository(models.Model):
     name = models.CharField(max_length=100, unique=True)
     path = models.CharField(max_length=250*3)
@@ -92,23 +86,27 @@ class Repository(models.Model):
     def __repr__(self):
         return self.name
 
-class JobRun(models.Model):
-
-    job = models.ForeignKey(Job, on_delete=models.CASCADE, null=False)
-    start = models.DateTimeField("Date")
-
-
 
 class Report(models.Model):
 
-    job_run = models.ForeignKey(JobRun, on_delete=models.CASCADE, editable=False)
+    job = models.ForeignKey(Job, on_delete=models.DO_NOTHING, null=False)
+    start = models.DateTimeField("Date", auto_now=True)
+
+
+class Track(models.Model):
+
+    WAITING = 'WAITING'
+    RUNING = 'RUNNING'
+    COMPLETE = 'COMPLETE'
+    STATE_OF_TRACK = [
+        (WAITING, 'WAITING'),
+        (RUNING, 'RUNNING'),
+        (COMPLETE, 'COMPLETE')
+    ]
+    report = models.ForeignKey(Report, on_delete=models.DO_NOTHING, editable=False)
     repsository_path = models.CharField(max_length=270*3)
     destination_path = models.CharField(max_length=270*3)
-    status = models.BooleanField(default=False)
+    status = models.CharField(max_length=50, choices=STATE_OF_TRACK, default=WAITING)
 
     def __str__(self):
-        return f"Report {self}"
-
-
-
-
+        return f"Report {self.id}"

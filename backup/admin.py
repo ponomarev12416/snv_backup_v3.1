@@ -7,7 +7,7 @@ from django.template.response import TemplateResponse
 
 # Register your models here.
 
-from .models import Job, JobRun, Report, Repository
+from .models import Job, Report, Track, Repository
 
 
 
@@ -50,13 +50,13 @@ class RepositoryAdmin(admin.ModelAdmin):
 
 
 class ReportInline(admin.TabularInline):
-    model = Report
+    model = Track
 
     readonly_fields = ['repsository_path', 'destination_path']
 
 class JobRunAdmin(admin.ModelAdmin):
     readonly_fields = ['job', 'start']
-    model = JobRun
+    model = Report
 
     inlines = [ReportInline]
 
@@ -67,4 +67,4 @@ class JobRunAdmin(admin.ModelAdmin):
 
 admin.site.register(Job, JobAdmin)
 admin.site.register(Repository, RepositoryAdmin)
-admin.site.register(JobRun, JobRunAdmin)
+admin.site.register(Report, JobRunAdmin)
