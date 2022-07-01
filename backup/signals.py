@@ -14,24 +14,20 @@ def job_handler(sender, **kw):
     transaction.on_commit(lambda: add_task(job.id))
 
 
-
-
 def add_task(arg):
     job: Job = Job.objects.get(pk=arg)
-    path_list = []
-    for rep in job.repositories.all():
-        path_list.append(rep.path)
+    path_list = [rep.path for rep in job.repositories.all()]
     days = job.get_days_cron_style()
-    hour = job.get_hours()
-    minutes = job.get_minutes()
-    
+    hour, minutes = job.get_hours_and_minutes()
+    # if job is already created and need to be updated
     if job.schedule:
-        #x = Schedule.objects.get(pk=job.schedule.id)
-        schedule_ = schedule('backup.utils.make_backups', job.destination, *path_list,
-             schedule_type=Schedule.CRON, cron=f'{minutes} {hour} * * {days}')
-        Schedule.objects.filter(pk=job.schedule.id).update(schedule_)
+        Schedule.objects.filter(pk=job.schedule.id).update(
+            cron=f'{minutes} {hour} * * {days}'
+        )
+        
+    # creating a new job with new shcedule
     else:
-        job.schedule = schedule('backup.utils.make_backups', job.destination, *path_list,
-             schedule_type=Schedule.CRON, cron=f'{minutes} {hour} * * {days}')
+        job.schedule = schedule('backup.utils.make_backups', job.destination, 
+            *path_list, schedule_type=Schedule.CRON, 
+            cron=f'{minutes} {hour} * * {days}')
         job.save()
-

@@ -8,7 +8,8 @@ class Job(models.Model):
     name = models.CharField(max_length=200, unique=True)
     status = models.CharField(max_length=50, default='READY')
     last_run = models.CharField(max_length=200, default='')
-    date_created = models.DateTimeField('date created', auto_now_add=True, blank=True)
+    date_created = models.DateTimeField(
+        'date created', auto_now_add=True, blank=True)
     destination = models.CharField(max_length=270*5)
 
     time = models.TimeField('time to start')
@@ -25,16 +26,19 @@ class Job(models.Model):
 
     def get_hours(self):
         return str(self.time.hour)
-    
+
     def get_minutes(self):
         return str(self.time.minute)
+
+    def get_hours_and_minutes(self):
+        return str(self.time.hour), str(self.time.minute)
 
     def get_days_cron_style(self):
         """
         Returns string of days for crontab"""
         days = []
         if self.MONDAY:
-            days.append('MON') 
+            days.append('MON')
         if self.TUESDAY:
             days.append('TUE')
         if self.WEDNESDAY:
@@ -48,17 +52,12 @@ class Job(models.Model):
         if self.SUNDAY:
             days.append('SUN')
         return ','.join(days)
-        
 
-
-
-    
     def __str__(self):
         return self.name
 
     def __repr__(self):
         return self.name
-
 
 
 class Repository(models.Model):
@@ -72,5 +71,4 @@ class Repository(models.Model):
         return f"{self.name} : {self.path}"
 
     def __repr__(self):
-        return self.name 
-
+        return self.name
