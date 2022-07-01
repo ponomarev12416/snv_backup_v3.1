@@ -7,7 +7,7 @@ from django.template.response import TemplateResponse
 
 # Register your models here.
 
-from .models import Job, Repository
+from .models import Job, JobRun, Report, Repository
 
 
 
@@ -26,7 +26,7 @@ class RepositoriesInline(admin.ModelAdmin):
 
 class JobAdmin(admin.ModelAdmin):
     model = Job
-    exclude = ['status', 'last_run']
+    exclude = ['status', 'last_run', 'schedule']
     list_display = ('name', 'destination',
                      'date_created', 'last_run')
 
@@ -49,8 +49,22 @@ class RepositoryAdmin(admin.ModelAdmin):
         return super().get_list_display(request)
 
 
+class ReportInline(admin.TabularInline):
+    model = Report
 
+    readonly_fields = ['repsository_path', 'destination_path']
+
+class JobRunAdmin(admin.ModelAdmin):
+    readonly_fields = ['job', 'start']
+    model = JobRun
+
+    inlines = [ReportInline]
+
+    
+    def has_add_permission(self, request, obj=None):
+        return False
 
 
 admin.site.register(Job, JobAdmin)
 admin.site.register(Repository, RepositoryAdmin)
+admin.site.register(JobRun, JobRunAdmin)
