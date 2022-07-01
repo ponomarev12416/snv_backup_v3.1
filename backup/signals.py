@@ -1,4 +1,4 @@
-from django.db.models.signals import post_save, pre_init
+from django.db.models.signals import post_save, post_delete
 from django.db import transaction
 from django.dispatch import receiver
 from django_q.tasks import schedule
@@ -6,6 +6,12 @@ from django_q.models import Schedule
 
 from .models import Job, Repository
 from .utils import backup
+
+
+@receiver(post_delete, sender=Job)
+def job_delete(sender, **kw):
+    job: Job = kw['instance']
+    Schedule.objects.filter(pk=job.id).delete()
 
 
 @receiver(post_save, sender=Job)
@@ -23,11 +29,10 @@ def add_task(arg):
     if job.schedule:
         Schedule.objects.filter(pk=job.schedule.id).update(
             cron=f'{minutes} {hour} * * {days}'
-        )
-        
+        )  
     # creating a new job with new shcedule
     else:
-        job.schedule = schedule('backup.utils.make_backups', job.destination, 
-            *path_list, schedule_type=Schedule.CRON, 
+        job.schedule = schedule('backup.utils.make_backups', job.id, 
+            schedule_type=Schedule.CRON, 
             cron=f'{minutes} {hour} * * {days}')
         job.save()
