@@ -8,8 +8,7 @@ from django.template.response import TemplateResponse
 # Register your models here.
 
 from .models import Job, Report, Track, Repository
-
-
+from .utils import update_repos_meta
 
 class MembershipInline(admin.TabularInline):
     model = Repository.job.through
@@ -17,42 +16,51 @@ class MembershipInline(admin.TabularInline):
 
 
 class RepositoriesInline(admin.ModelAdmin):
-    
+
     model = Repository
     extra = 0
-
-
 
 
 class JobAdmin(admin.ModelAdmin):
     model = Job
     exclude = ['status', 'last_run', 'schedule']
     list_display = ('name', 'destination',
-                     'date_created', 'last_run')
+                    'date_created', 'last_run')
 
     formfield_overrides = {
-        mdl.CharField: {'widget': TextInput(attrs={'size':'120'})},
+        mdl.CharField: {'widget': TextInput(attrs={'size': '120'})},
     }
 
     inlines = [MembershipInline]
 
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)
-        
+
 
 class RepositoryAdmin(admin.ModelAdmin):
 
     list_display = ('name', 'path', 'modified')
 
-    def get_list_display(self, request):
-        print("ddddddsssssssssssssssssssssssssssssss")
-        return super().get_list_display(request)
+    # A template for a very customized change view:
+    #change_form_template = 'admin/ba/extras/openstreetmap_change_form.html'
+
+    def get_osm_info(self):
+        update_repos_meta()
+        
+
+    def changelist_view(self, request, extra_context=None):
+        #return super().changelist_view(request, extra_context)
+        extra_context = extra_context or {}
+        extra_context['osm_data'] = self.get_osm_info()
+        return super().changelist_view(request, extra_context)
 
 
 class ReportInline(admin.TabularInline):
     model = Track
+    extra = 0
 
-    readonly_fields = ['repsository_path', 'destination_path']
+    readonly_fields = ['status', 'repsository_path', 'destination_path']
+
 
 class JobRunAdmin(admin.ModelAdmin):
     readonly_fields = ['job', 'start']
@@ -60,7 +68,6 @@ class JobRunAdmin(admin.ModelAdmin):
 
     inlines = [ReportInline]
 
-    
     def has_add_permission(self, request, obj=None):
         return False
 

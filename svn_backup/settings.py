@@ -135,11 +135,12 @@ CACHES = {
 
 Q_CLUSTER = {
     'name': 'DjangORM',
-    'workers': 4,
-    'timeout': 90,
-    'retry': 120,
-    'queue_limit': 50,
-    'bulk': 10,
+    'workers': 1,
+    'timeout': 42200,
+    'retry': 43200,
+    'queue_limit': 1,
+    'bulk': 1,
     'orm': 'default',
-    'has_replica': True
+    'has_replica': True,
+    'cpu_affinity': 1,
 }

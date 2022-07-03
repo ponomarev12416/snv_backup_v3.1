@@ -1,4 +1,4 @@
-from calendar import MONDAY
+from datetime import datetime
 from django.core.exceptions import ValidationError
 from django_q.models import Schedule
 from django.db import models
@@ -76,7 +76,7 @@ class Job(models.Model):
 class Repository(models.Model):
     name = models.CharField(max_length=100, unique=True)
     path = models.CharField(max_length=250*3)
-    modified = models.DateTimeField('Modified time', auto_now=True, blank=True)
+    modified = models.DateTimeField('Modified time', default=None, blank=True, null=True)
 
     job = models.ManyToManyField(Job, related_name='repositories', blank=True)
 
@@ -89,8 +89,12 @@ class Repository(models.Model):
 
 class Report(models.Model):
 
-    job = models.ForeignKey(Job, on_delete=models.DO_NOTHING, null=False)
-    start = models.DateTimeField("Date", auto_now=True)
+    job = models.ForeignKey(Job, on_delete=models.SET_NULL, null=True)
+    start = models.DateTimeField("Date", auto_now=True, null=True)
+
+    def __str__(self):
+        return self.start.strftime('%c')
+        #f'{str(self.start.year)}{str(self.start.month)}  {str(self.start.day)}'
 
 
 class Track(models.Model):
@@ -103,10 +107,10 @@ class Track(models.Model):
         (RUNING, 'RUNNING'),
         (COMPLETE, 'COMPLETE')
     ]
-    report = models.ForeignKey(Report, on_delete=models.DO_NOTHING, editable=False)
+    report = models.ForeignKey(Report, on_delete=models.SET_NULL, null=True)
     repsository_path = models.CharField(max_length=270*3)
     destination_path = models.CharField(max_length=270*3)
     status = models.CharField(max_length=50, choices=STATE_OF_TRACK, default=WAITING)
 
     def __str__(self):
-        return f"Report {self.id}"
+        return f"Track {self.id}"
