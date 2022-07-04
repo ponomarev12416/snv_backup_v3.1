@@ -19,6 +19,7 @@ def run_jobs(modeladmin, request, queryset):
         chain.append('backup.utils.make_backups', job.id)
     chain.run()
 
+
 class MembershipInline(admin.TabularInline):
     model = Repository.job.through
     extra = 1

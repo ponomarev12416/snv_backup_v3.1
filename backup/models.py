@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 from django.core.exceptions import ValidationError
 from django_q.models import Schedule
@@ -38,6 +39,8 @@ class Job(models.Model):
             raise ValidationError("One of the days must be chosen")
         if not self.time:
             raise ValidationError("Provide proper time")
+        if not os.path.exists(self.destination):
+            raise ValidationError(f"Can't find repository at {self.destination}",)
 
     def get_hours(self):
         return str(self.time.hour)

@@ -21,6 +21,7 @@ def job_handler(sender, **kw):
 
 
 def add_task(job_id):
+    import arrow
     job: Job = Job.objects.get(pk=job_id)
     days = job.get_days_cron_style()
     hour, minutes = job.get_hours_and_minutes()
@@ -33,5 +34,7 @@ def add_task(job_id):
     else:
         job.schedule = schedule('backup.utils.make_backups', job.id, 
             schedule_type=Schedule.CRON, 
+            next_run=str(arrow.utcnow().replace(hour=int(hour), minute=int(minutes))),
             cron=f'{minutes} {hour} * * {days}')
         job.save()
+    
