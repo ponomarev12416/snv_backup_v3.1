@@ -4,6 +4,8 @@ from django_q.models import Schedule
 from django.db import models
 
 
+MAX_PATH_LENGTH = 270*5
+
 class Job(models.Model):
 
     name = models.CharField(max_length=200, unique=True)
@@ -11,7 +13,7 @@ class Job(models.Model):
     last_run = models.CharField(max_length=200, default='')
     date_created = models.DateTimeField(
         'date created', auto_now_add=True, blank=True)
-    destination = models.CharField(max_length=270*5)
+    destination = models.CharField(max_length=MAX_PATH_LENGTH)
 
     time = models.TimeField('time to start')
     monday = models.BooleanField()
@@ -75,7 +77,7 @@ class Job(models.Model):
 
 class Repository(models.Model):
     name = models.CharField(max_length=100, unique=True)
-    path = models.CharField(max_length=250*3)
+    path = models.CharField(max_length=MAX_PATH_LENGTH)
     modified = models.DateTimeField('Modified time', default=None, blank=True, null=True)
 
     job = models.ManyToManyField(Job, related_name='repositories', blank=True)
@@ -90,7 +92,8 @@ class Repository(models.Model):
 class Report(models.Model):
 
     job = models.ForeignKey(Job, on_delete=models.SET_NULL, null=True)
-    start = models.DateTimeField("Date", auto_now=True, null=True)
+    start = models.DateTimeField("Start Date", auto_now=True, null=True)
+    destination_path = models.CharField("Destination path", max_length=MAX_PATH_LENGTH)
 
     def __str__(self):
         return self.start.strftime('%c')
@@ -107,9 +110,9 @@ class Track(models.Model):
         (RUNING, 'RUNNING'),
         (COMPLETE, 'COMPLETE')
     ]
-    report = models.ForeignKey(Report, on_delete=models.SET_NULL, null=True)
-    repsository_path = models.CharField(max_length=270*3)
-    destination_path = models.CharField(max_length=270*3)
+    report = models.ForeignKey(Report, on_delete=models.CASCADE, null=True)
+    repository_path = models.CharField(max_length=MAX_PATH_LENGTH)
+    #destination_path = models.CharField(max_length=MAX_PATH_LENGTH)
     status = models.CharField(max_length=50, choices=STATE_OF_TRACK, default=WAITING)
 
     def __str__(self):

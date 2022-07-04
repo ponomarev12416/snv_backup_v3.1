@@ -50,6 +50,7 @@ class JobAdmin(admin.ModelAdmin):
 class RepositoryAdmin(admin.ModelAdmin):
 
     list_display = ('name', 'path', 'modified')
+    exclude = ['modified']
 
     # A template for a very customized change view:
     #change_form_template = 'admin/ba/extras/openstreetmap_change_form.html'
@@ -68,11 +69,12 @@ class ReportInline(admin.TabularInline):
     model = Track
     extra = 0
 
-    readonly_fields = ['status', 'repsository_path', 'destination_path']
+    readonly_fields = ['status', 'repository_path']
 
 
 class JobRunAdmin(admin.ModelAdmin):
-    readonly_fields = ['job', 'start']
+    readonly_fields = ['job', 'start', 'destination_path']
+    list_display = ('job', 'start', 'destination_path')
     model = Report
 
     inlines = [ReportInline]

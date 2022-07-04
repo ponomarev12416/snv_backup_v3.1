@@ -55,9 +55,10 @@ def make_backups(*args):
     repo_pathes = [rep.path for rep in job.repositories.all()]
     report = init_report(job)
     for repo_path in repo_pathes:
+        print('XXXXXXXXXXXXXX', repo_path, "========================")
         track: Track = (Track.objects
             .filter(report=report.id)
-            .filter(repsository_path=repo_path)[0])
+            .filter(repository_path=repo_path)[0])
         track.status = Track.RUNING
         track.save()
         backup(repo_path, job.destination)
@@ -69,11 +70,10 @@ def make_backups(*args):
 
 def init_report(job: Job):
     # Create initial report for current job
-    report = Report.objects.create(job=job)
+    report = Report.objects.create(job=job, destination_path=job.destination)
     for repository in job.repositories.all():
         Track.objects.create(
             report=report,
-            destination_path=job.destination,
-            repsository_path=repository.path)
+            repository_path=repository.path)
     return report
     
