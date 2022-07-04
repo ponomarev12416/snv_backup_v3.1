@@ -1,6 +1,4 @@
 import subprocess
-from django.db.models import Q
-from django.utils import timezone
 from datetime import datetime
 
 
@@ -65,8 +63,7 @@ def make_backups(*args):
         backup(repo_path, job.destination)
         track.status = Track.COMPLETE
         track.save()
-    #job.last_run = datetime.now()
-    job.last_run = timezone.now()
+    job.last_run = datetime.now()
     job.save()
 
 
