@@ -28,13 +28,12 @@ def add_task(job_id):
     # if job is already created and need to be updated
     if job.schedule:
         Schedule.objects.filter(pk=job.schedule.id).update(
-            cron=f'{minutes} {hour} * * {days}'
-        )  
+            #next_run=job.get_next_run(),
+            cron=f'{minutes} {hour} * * {days}')
     # creating a new job with new shcedule
     else:
-        job.schedule = schedule('backup.utils.make_backups', job.id, 
-            schedule_type=Schedule.CRON, 
-            next_run=str(arrow.utcnow().replace(hour=int(hour), minute=int(minutes))),
-            cron=f'{minutes} {hour} * * {days}')
+        job.schedule = schedule('backup.utils.make_backups', job.id,
+                                schedule_type=Schedule.CRON,
+                                next_run=job.get_next_run(),
+                                cron=f'{minutes} {hour} * * {days}')
         job.save()
-    

@@ -1,11 +1,14 @@
+import arrow
 import os
 from datetime import datetime
 from django.core.exceptions import ValidationError
 from django_q.models import Schedule
+
 from django.db import models
 
 
 MAX_PATH_LENGTH = 270*5
+
 
 class Job(models.Model):
 
@@ -40,13 +43,14 @@ class Job(models.Model):
         if not self.time:
             raise ValidationError("Provide proper time")
         if not os.path.exists(self.destination):
-            raise ValidationError(f"Can't find repository at {self.destination}",)
+            raise ValidationError(
+                f"Can't find repository at {self.destination}",)
 
     def get_hours(self):
-        return str(self.time.hour)
+        return self.time.hour
 
     def get_minutes(self):
-        return str(self.time.minute)
+        return self.time.minute
 
     def get_hours_and_minutes(self):
         return str(self.time.hour), str(self.time.minute)
@@ -71,6 +75,37 @@ class Job(models.Model):
             days.append('SUN')
         return ','.join(days)
 
+    def _get_selected_days_numbers(self):
+        days_of_week = [0] * 7
+        if self.monday:
+            days_of_week[0] = 1
+        if self.tuesday:
+            days_of_week[1] = 1
+        if self.wednesday:
+            days_of_week[2] = 1
+        if self.thursday:
+            days_of_week[3] = 1
+        if self.friday:
+            days_of_week[4] = 1
+        if self.saturday:
+            days_of_week[5] = 1
+        if self.sunday:
+            days_of_week[6] = 1
+        return days_of_week
+
+    def get_next_run(self):
+        days_of_week = self._get_selected_days_numbers()
+        dow = datetime.now().weekday()
+        delta = 0
+        if 1 in days_of_week[dow:]:
+            delta = days_of_week.index(1, dow) - dow
+        else:
+            delta = 6 - dow + days_of_week.index(1)
+        next_run = (arrow.utcnow().to('Europe/Moscow')
+                    .replace(hour=self.get_hours(), minute=self.get_minutes())
+                    .shift(days=delta))
+        return str(next_run)
+
     def __str__(self):
         return self.name
 
@@ -81,7 +116,8 @@ class Job(models.Model):
 class Repository(models.Model):
     name = models.CharField(max_length=100, unique=True)
     path = models.CharField(max_length=MAX_PATH_LENGTH)
-    modified = models.DateTimeField('Modified time', default=None, blank=True, null=True)
+    modified = models.DateTimeField(
+        'Modified time', default=None, blank=True, null=True)
 
     job = models.ManyToManyField(Job, related_name='repositories', blank=True)
 
@@ -96,7 +132,8 @@ class Report(models.Model):
 
     job = models.ForeignKey(Job, on_delete=models.SET_NULL, null=True)
     start = models.DateTimeField("Start Date", auto_now=True, null=True)
-    destination_path = models.CharField("Destination path", max_length=MAX_PATH_LENGTH)
+    destination_path = models.CharField(
+        "Destination path", max_length=MAX_PATH_LENGTH)
 
     def __str__(self):
         return self.start.strftime('%c')
@@ -116,7 +153,8 @@ class Track(models.Model):
     report = models.ForeignKey(Report, on_delete=models.CASCADE, null=True)
     repository_path = models.CharField(max_length=MAX_PATH_LENGTH)
     #destination_path = models.CharField(max_length=MAX_PATH_LENGTH)
-    status = models.CharField(max_length=50, choices=STATE_OF_TRACK, default=WAITING)
+    status = models.CharField(
+        max_length=50, choices=STATE_OF_TRACK, default=WAITING)
 
     def __str__(self):
         return f"Track {self.id}"
