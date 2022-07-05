@@ -12,6 +12,7 @@ from .models import Job, Report, Track, Repository
 from .utils import update_repos_meta, make_backups
 
 
+
 @admin.action(description='Run selected jobs')
 def run_jobs(modeladmin, request, queryset):
     chain = Chain(cached=True)
@@ -26,6 +27,7 @@ class MembershipInline(admin.TabularInline):
 
 
 class RepositoriesInline(admin.ModelAdmin):
+    
 
     model = Repository
     extra = 0
@@ -49,6 +51,8 @@ class JobAdmin(admin.ModelAdmin):
 
 
 class RepositoryAdmin(admin.ModelAdmin):
+
+    search_fields = ['name']
 
     list_display = ('name', 'path', 'modified')
     exclude = ['modified']

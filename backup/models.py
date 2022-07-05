@@ -44,7 +44,7 @@ class Job(models.Model):
             raise ValidationError("Provide proper time")
         if not os.path.exists(self.destination):
             raise ValidationError(
-                f"Can't find repository at {self.destination}",)
+                f"Path doesn't exist {self.destination}",)
 
     def get_hours(self):
         return self.time.hour
@@ -120,6 +120,11 @@ class Repository(models.Model):
         'Modified time', default=None, blank=True, null=True)
 
     job = models.ManyToManyField(Job, related_name='repositories', blank=True)
+
+    def clean(self):
+        if not os.path.exists(self.path):
+            raise ValidationError(
+                f"Path doesn't exist {self.path}",)
 
     def __str__(self):
         return f"{self.name} : {self.path}"
