@@ -37,7 +37,7 @@ class JobAdmin(admin.ModelAdmin):
     model = Job
     exclude = ['status', 'last_run', 'schedule']
     list_display = ('name', 'destination',
-                    'date_created', 'last_run')
+                    'date_created', 'time_elapsed', 'last_run')
 
     formfield_overrides = {
         mdl.CharField: {'widget': TextInput(attrs={'size': '120'})},
@@ -74,7 +74,7 @@ class ReportInline(admin.TabularInline):
     model = Track
     extra = 0
 
-    readonly_fields = ['status', 'repository_path']
+    readonly_fields = ['status', 'repository_path', 'time_elapsed']
 
 
 class JobRunAdmin(admin.ModelAdmin):

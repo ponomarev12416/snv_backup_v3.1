@@ -1,10 +1,4 @@
-import sys
 import os
-import getopt
-import stat
-import re
-import time
-import shutil
 import subprocess
 from functools import cmp_to_key
 
@@ -47,6 +41,24 @@ if __name__ == "__main__":
     import time
     res = get_date_modified(r'D:\\Repositories\\trash\\repos')
     print(res)
+
+
+def scan_for_repos(path):
+    from .models import Repository
+    for obj in os.listdir(path):
+        full_path = os.path.join(path, obj)
+        if (os.path.islink(full_path) 
+            and not Repository.objects.filter(path=full_path)):
+            Repository.objects.create(name=obj, path=full_path)
+
+def time_converter(total_seconds):
+    total_seconds = int(total_seconds)
+    minutes_per_hour = 60
+    hours = total_seconds // minutes_per_hour
+    seconds_per_minute = 60
+    minutes = (total_seconds - (hours * minutes_per_hour)) // seconds_per_minute
+    return f'{hours}:{minutes:02d}'
+
 
 
 def backup(*args, **kw):

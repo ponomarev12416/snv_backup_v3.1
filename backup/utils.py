@@ -1,5 +1,8 @@
 import subprocess
+import time
 from datetime import datetime
+
+from backup.temp import time_converter
 
 
 from .backuper import backup as backup
@@ -50,12 +53,13 @@ def update_repos_meta():
 
 
 def make_backups(*args):
+    start_job = time.time()
     job: Job = Job.objects.get(pk=args[0])
 
     repo_pathes = [rep.path for rep in job.repositories.all()]
     report = init_report(job)
     for repo_path in repo_pathes:
-        print('XXXXXXXXXXXXXX', repo_path, "========================")
+        start = time.time()
         track: Track = (Track.objects
             .filter(report=report.id)
             .filter(repository_path=repo_path)[0])
@@ -63,8 +67,10 @@ def make_backups(*args):
         track.save()
         backup(repo_path, job.destination)
         track.status = Track.COMPLETE
+        track.time_elapsed = time_converter(time.time() - start)
         track.save()
     job.last_run = datetime.now()
+    job.time_elapsed = time_converter(time.time() - start_job)
     job.save()
 
 

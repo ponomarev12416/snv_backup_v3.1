@@ -30,6 +30,8 @@ class Job(models.Model):
 
     schedule = models.OneToOneField(
         Schedule, on_delete=models.CASCADE, blank=True, null=True)
+    time_elapsed = models.CharField(
+        'Elapsed time', max_length=5, blank=True, null=True)
 
     def clean(self):
         if not (self.monday
@@ -160,6 +162,8 @@ class Track(models.Model):
     #destination_path = models.CharField(max_length=MAX_PATH_LENGTH)
     status = models.CharField(
         max_length=50, choices=STATE_OF_TRACK, default=WAITING)
+    time_elapsed = models.CharField(
+        'Elapsed time', max_length=5, blank=True, null=True)
 
     def __str__(self):
         return f"Track {self.id}"
