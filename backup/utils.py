@@ -1,5 +1,7 @@
+import os
 import subprocess
 import time
+
 from datetime import datetime
 
 from backup.temp import time_converter
@@ -83,3 +85,11 @@ def init_report(job: Job):
             repository_path=repository.path)
     return report
     
+
+def scan_for_repos(path):
+    from .models import Repository
+    for obj in os.listdir(path):
+        full_path = os.path.join(path, obj)
+        if (os.path.islink(full_path) 
+            and not Repository.objects.filter(path=full_path)):
+            Repository.objects.create(name=obj, path=full_path)

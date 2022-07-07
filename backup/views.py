@@ -1,17 +1,14 @@
-from django.http import HttpResponse,Http404
-from django.template import loader
-from django.shortcuts import render
+from django.http import Http404
+from django.shortcuts import render, redirect
 
+import backup.config as config
+from .utils import scan_for_repos
 from .models import Job
 
 def index(request):
-    latest_job_list = Job.objects.all()
-    output = ', '.join([q.name for q in latest_job_list])
-    template = loader.get_template('backup/index.html')
-    context = {
-        'latest_job_list': latest_job_list
-    }
-    return HttpResponse(template.render(context, request))
+    for path in config.repo_path:
+        scan_for_repos(path)   
+    return redirect('/admin/backup/repository')
 
 
 def detail(request, job_id):
