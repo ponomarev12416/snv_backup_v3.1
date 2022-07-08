@@ -152,10 +152,12 @@ class Track(models.Model):
     WAITING = 'WAITING'
     RUNING = 'RUNNING'
     COMPLETE = 'COMPLETE'
+    FAILED = 'FAILED'
     STATE_OF_TRACK = [
         (WAITING, 'WAITING'),
         (RUNING, 'RUNNING'),
-        (COMPLETE, 'COMPLETE')
+        (COMPLETE, 'COMPLETE'),
+        (FAILED, 'FAILED')
     ]
     report = models.ForeignKey(Report, on_delete=models.CASCADE, null=True)
     repository_path = models.CharField(max_length=MAX_PATH_LENGTH)

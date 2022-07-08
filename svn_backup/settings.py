@@ -110,7 +110,7 @@ LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'Europe/Moscow'
 
-USE_I18N = True#True
+USE_I18N = True  # True
 
 USE_TZ = True
 
@@ -143,4 +143,23 @@ Q_CLUSTER = {
     'orm': 'default',
     'has_replica': True,
     'cpu_affinity': 1,
+}
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'warning': {
+            'level': 'WARNING',
+            'class': 'logging.FileHandler',
+            'filename': './warning.log',
+        },
+    },
+    'loggers': {
+        'django.warning': {
+            'handlers': ['warning'],
+            'level': 'WARNING',
+            'propagate': True,
+        },
+    },
 }

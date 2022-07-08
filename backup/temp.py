@@ -53,10 +53,10 @@ def scan_for_repos(path):
 
 def time_converter(total_seconds):
     total_seconds = int(total_seconds)
+    minutes_per_second = 60
+    minutes = total_seconds // minutes_per_second
     minutes_per_hour = 60
-    hours = total_seconds // minutes_per_hour
-    seconds_per_minute = 60
-    minutes = (total_seconds - (hours * minutes_per_hour)) // seconds_per_minute
+    hours = minutes // minutes_per_hour
     return f'{hours}:{minutes:02d}'
 
 

@@ -1,6 +1,7 @@
 import os
 import subprocess
 import time
+import logging
 
 from datetime import datetime
 
@@ -44,12 +45,13 @@ def get_date_modified(repo_dir):
 
 
 def update_repos_meta():
-    import datetime
     repositories = Repository.objects.all()
     for repo in repositories:
         try:
             repo.modified = get_date_modified(repo.path)
         except Exception:
+            logger = logging.getLogger('django.warning')
+            logger.warning('Failed to get date of last modification %s' % repo.path)
             repo.modified = None
         repo.save()
 
@@ -67,7 +69,15 @@ def make_backups(*args):
             .filter(repository_path=repo_path)[0])
         track.status = Track.RUNING
         track.save()
-        backup(repo_path, job.destination)
+        try:
+            backup(repo_path, job.destination)
+        except Exception as e:
+            logger = logging.getLogger('django.warning')
+            logger.warning('Failed to backup %s to %s' % (repo_path, job.destination))
+            track.status = Track.FAILED
+            track.time_elapsed = time_converter(time.time() - start)
+            track.save()
+            continue
         track.status = Track.COMPLETE
         track.time_elapsed = time_converter(time.time() - start)
         track.save()
@@ -80,16 +90,27 @@ def init_report(job: Job):
     # Create initial report for current job
     report = Report.objects.create(job=job, destination_path=job.destination)
     for repository in job.repositories.all():
-        Track.objects.create(
-            report=report,
-            repository_path=repository.path)
+        
+        try:
+            Track.objects.create(
+                report=report,
+                repository_path=repository.path)
+        except Exception:
+            logger = logging.getLogger('django.warning')
+            logger.warning('Failed to write the Track %s : %s' % (report, repository.path))
+            continue
     return report
     
 
 def scan_for_repos(path):
     from .models import Repository
     for obj in os.listdir(path):
-        full_path = os.path.join(path, obj)
-        if (os.path.islink(full_path) 
-            and not Repository.objects.filter(path=full_path)):
-            Repository.objects.create(name=obj, path=full_path)
+        try:
+            full_path = os.path.join(path, obj)
+            if (os.path.islink(full_path) 
+                and not Repository.objects.filter(path=full_path)):
+                Repository.objects.create(name=obj, path=full_path)
+        except Exception:
+            logger = logging.getLogger('django.warning')
+            logger.warning('Failde to import %s' % full_path)
+            continue

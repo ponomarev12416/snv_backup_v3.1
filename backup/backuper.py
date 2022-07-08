@@ -234,7 +234,8 @@ def backup(repo_dir, backup_dir):
     except Exception as e:
         sys.stderr.write("%s\n" % e)
         sys.stderr.flush()
-        sys.exit(1)
+        #sys.exit(1)
+        raise
 
     print("Youngest revision is %s" % youngest)
 
@@ -272,7 +273,8 @@ def backup(repo_dir, backup_dir):
     if err_code != 0:
         sys.stderr.write("Unable to backup the repository.\n")
         sys.stderr.flush()
-        sys.exit(err_code)
+        #sys.exit(err_code)
+        raise Exception
     else:
         print("Done.")
 
@@ -283,7 +285,8 @@ def backup(repo_dir, backup_dir):
         if err_code != 0:
             sys.stderr.write("Backup verification failed.\n")
             sys.stderr.flush()
-            sys.exit(err_code)
+            #sys.exit(err_code)
+            raise Exception
         else:
             print("Done.")
 
@@ -337,7 +340,8 @@ def backup(repo_dir, backup_dir):
             sys.stderr.write(
                 "Unable to create an archive for the backup.\n%s\n" % err_msg)
             sys.stderr.flush()
-            sys.exit(err_code)
+            #sys.exit(err_code)
+            raise Exception
         else:
             print("Archive created, removing backup '" + backup_subdir + "'...")
             safe_rmtree(backup_subdir, 1)
