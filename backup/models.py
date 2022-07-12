@@ -10,6 +10,24 @@ from django.db import models
 MAX_PATH_LENGTH = 270*5
 
 
+class Repository(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    path = models.CharField(max_length=MAX_PATH_LENGTH)
+    modified = models.DateTimeField(
+        'Modified time', default=None, blank=True, null=True)
+
+    def clean(self):
+        if not os.path.exists(self.path):
+            raise ValidationError(
+                f"Path doesn't exist {self.path}",)
+
+    def __str__(self):
+        return f"{self.name} | {self.path} | {self.modified}"
+
+    def __repr__(self):
+        return self.name
+
+
 class Job(models.Model):
 
     name = models.CharField(max_length=200, unique=True)
@@ -32,6 +50,8 @@ class Job(models.Model):
         Schedule, on_delete=models.CASCADE, blank=True, null=True)
     time_elapsed = models.CharField(
         'Elapsed time', max_length=5, blank=True, null=True)
+
+    repository = models.ManyToManyField(Repository, related_name='repository')
 
     def clean(self):
         if not (self.monday
@@ -110,26 +130,6 @@ class Job(models.Model):
 
     def __str__(self):
         return self.name
-
-    def __repr__(self):
-        return self.name
-
-
-class Repository(models.Model):
-    name = models.CharField(max_length=100, unique=True)
-    path = models.CharField(max_length=MAX_PATH_LENGTH)
-    modified = models.DateTimeField(
-        'Modified time', default=None, blank=True, null=True)
-
-    job = models.ManyToManyField(Job, related_name='repositories', blank=True)
-
-    def clean(self):
-        if not os.path.exists(self.path):
-            raise ValidationError(
-                f"Path doesn't exist {self.path}",)
-
-    def __str__(self):
-        return f"{self.name} : {self.path}"
 
     def __repr__(self):
         return self.name

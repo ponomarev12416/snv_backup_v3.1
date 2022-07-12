@@ -59,8 +59,10 @@ def update_repos_meta():
 def make_backups(*args):
     start_job = time.time()
     job: Job = Job.objects.get(pk=args[0])
-
-    repo_pathes = [rep.path for rep in job.repositories.all()]
+    job.status = 'RUNNING'
+    job.save()
+    job: Job = Job.objects.get(pk=args[0])
+    repo_pathes = [rep.path for rep in job.repository.all()]
     report = init_report(job)
     for repo_path in repo_pathes:
         start = time.time()
@@ -77,19 +79,23 @@ def make_backups(*args):
             track.status = Track.FAILED
             track.time_elapsed = time_converter(time.time() - start)
             track.save()
+            job.status = 'FAILED'
             continue
         track.status = Track.COMPLETE
         track.time_elapsed = time_converter(time.time() - start)
         track.save()
     job.last_run = datetime.now()
     job.time_elapsed = time_converter(time.time() - start_job)
+    if job.status == 'RUNNING':
+        print('SAVE STATUS')
+        job.status = 'READY'        
     job.save()
 
 
 def init_report(job: Job):
     # Create initial report for current job
     report = Report.objects.create(job=job, destination_path=job.destination)
-    for repository in job.repositories.all():
+    for repository in job.repository.all():
         
         try:
             Track.objects.create(

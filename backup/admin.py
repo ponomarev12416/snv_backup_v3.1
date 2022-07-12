@@ -21,10 +21,6 @@ def run_jobs(modeladmin, request, queryset):
     chain.run()
 
 
-class MembershipInline(admin.TabularInline):
-    model = Repository.job.through
-    extra = 1
-
 
 class RepositoriesInline(admin.ModelAdmin):
     
@@ -36,14 +32,14 @@ class RepositoriesInline(admin.ModelAdmin):
 class JobAdmin(admin.ModelAdmin):
     model = Job
     exclude = ['status', 'last_run', 'schedule']
-    list_display = ('name', 'destination',
+    list_display = ('name', 'destination', 'status',
                     'date_created', 'time_elapsed', 'last_run')
 
     formfield_overrides = {
         mdl.CharField: {'widget': TextInput(attrs={'size': '120'})},
     }
 
-    inlines = [MembershipInline]
+    #inlines = [MembershipInline]
     actions = [run_jobs]
 
     def save_model(self, request, obj, form, change):
