@@ -6,4 +6,5 @@ repo_path = [
     ]
 """
 
-repo_path = ['D:\\temp\\symlinks']
+repo_path = ['D:\\temp\\symlinks',
+ 'C:\\Program Files (x86)\\Microsoft Visual Studio']

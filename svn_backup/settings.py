@@ -80,6 +80,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
+        'timeout': 600,
     }
 }
 
@@ -148,18 +149,46 @@ Q_CLUSTER = {
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
     'handlers': {
-        'warning': {
-            'level': 'WARNING',
+        'file_debug': {
+            'level': 'INFO',
+            #'filters': ['require_debug_true'],
             'class': 'logging.FileHandler',
-            'filename': './warning.log',
+            'filename': './debug.log',
+            'formatter': 'verbose'
+        },
+        'file_error': {
+            'level': 'ERROR',
+            #'filters': ['require_debug_true'],
+            'class': 'logging.FileHandler',
+            'filename': './error.log',
+            'formatter': 'verbose'
         },
     },
     'loggers': {
-        'django.warning': {
-            'handlers': ['warning'],
-            'level': 'WARNING',
+        'django': {
+            'handlers': ['file_debug'],
             'propagate': True,
         },
-    },
+        'django.request': {
+            'handlers': ['file_error'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        'backup': {
+            'handlers': ['file_debug'],
+            'level': 'INFO',
+            #'filters': ['special']
+        }
+    }
 }

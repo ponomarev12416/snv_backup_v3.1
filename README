@@ -1,0 +1,10 @@
+1. В файле start.bat указать полный путь к manage.py файлу. Например, 
+   вместо manage.py должно быть C:\path\to\file\manage.py
+2. Запустить start.bat файл.
+3. Открыть папку содержащую manage.py. 
+   С помощью команды python manage.py createsuperuser создать суперпользователя.
+4. В файле config.py перечислить паки, в которых нужно искать репозитории.
+5. Выполнить команды 
+    python manage.py runserver
+    python manage.py qcluster
+6. Пререйти по адресу http://127.0.0.1:8000/admin

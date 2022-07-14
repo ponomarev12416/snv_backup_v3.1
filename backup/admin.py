@@ -1,7 +1,7 @@
 from email.headerregistry import Group
 from django.contrib import admin
 from django.db import models as mdl
-from django.forms import TextInput
+from django.forms import TextInput, CheckboxSelectMultiple, SelectMultiple
 from django.urls import path
 from django.template.response import TemplateResponse
 from django_q.tasks import Chain
@@ -21,23 +21,27 @@ def run_jobs(modeladmin, request, queryset):
     chain.run()
 
 
-
 class RepositoriesInline(admin.ModelAdmin):
-    
 
+    ordering = ('-modified',)
     model = Repository
     extra = 0
 
 
 class JobAdmin(admin.ModelAdmin):
     model = Job
-    exclude = ['status', 'last_run', 'schedule']
+    exclude = ['status', 'last_run', 'schedule', 'time_elapsed']
     list_display = ('name', 'destination', 'status',
-                    'date_created', 'time_elapsed', 'last_run')
-
+                    'date_created', 'last_run', 'time_elapsed')
+    
     formfield_overrides = {
         mdl.CharField: {'widget': TextInput(attrs={'size': '120'})},
+        mdl.ManyToManyField: {'widget': SelectMultiple(attrs={'size':'35', 'style': 'width:650px'})},
+       # mdl.ManyToManyField: {'widget': CheckboxSelectMultiple},
     }
+        
+        
+    
 
     #inlines = [MembershipInline]
     actions = [run_jobs]
@@ -69,6 +73,7 @@ class RepositoryAdmin(admin.ModelAdmin):
 class ReportInline(admin.TabularInline):
     model = Track
     extra = 0
+    
 
     readonly_fields = ['status', 'repository_path', 'time_elapsed']
 

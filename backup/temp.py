@@ -54,9 +54,10 @@ def scan_for_repos(path):
 def time_converter(total_seconds):
     total_seconds = int(total_seconds)
     minutes_per_second = 60
-    minutes = total_seconds // minutes_per_second
+    minutes_total = total_seconds // minutes_per_second
     minutes_per_hour = 60
-    hours = minutes // minutes_per_hour
+    hours = minutes_total // minutes_per_hour
+    minutes = minutes_total - hours * minutes_per_hour
     return f'{hours}:{minutes:02d}'
 
 
@@ -64,3 +65,25 @@ def time_converter(total_seconds):
 def backup(*args, **kw):
     import time
     time.sleep(30)
+
+def verify_repo(repo_dir):
+    p = subprocess.Popen([svnlook, 'verify', repo_dir],
+                         stdin=subprocess.PIPE,
+                         stdout=subprocess.PIPE,
+                         stderr=subprocess.PIPE,
+                         shell=True)
+    infile, outfile, errfile = p.stdin, p.stdout, p.stderr
+
+    stdout_lines = outfile.readlines()
+    stderr_lines = errfile.readlines()
+    outfile.close()
+    infile.close()
+    errfile.close()
+
+    if stderr_lines:
+        raise Exception("Unable to verify repository '%s'"
+                        ": %s" % (repo_dir, stderr_lines[0].rstrip()))
+
+    result = stdout_lines[0].decode('cp1251').strip().split(' ')
+    #str_date = ' '.join(str_date[0:2])
+    return result # datetime.strptime(str_date, '%Y-%m-%d %H:%M:%S')

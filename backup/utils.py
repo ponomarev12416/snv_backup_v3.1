@@ -15,7 +15,7 @@ from .models import Job, Report, Repository, Track
 
 # Path to svnlook utility
 svnlook = r"svnlook"  # r"@SVN_BINDIR@/svnlook"
-
+svnadmin = r"svnadmin"  # r"@SVN_BINDIR@/svnadmin"
 
 def get_date_modified(repo_dir):
     """Examine the repository REPO_DIR using the svnlook binary
@@ -113,10 +113,37 @@ def scan_for_repos(path):
     for obj in os.listdir(path):
         try:
             full_path = os.path.join(path, obj)
-            if (os.path.islink(full_path) 
+            if (os.path.isdir(full_path) 
                 and not Repository.objects.filter(path=full_path)):
                 Repository.objects.create(name=obj, path=full_path)
         except Exception:
             logger = logging.getLogger('django.warning')
             logger.warning('Failde to import %s' % full_path)
             continue
+
+def _verify(repo_dir):
+    p = subprocess.Popen([svnadmin, 'verify', repo_dir],
+                         stdin=subprocess.PIPE,
+                         stdout=subprocess.PIPE,
+                         stderr=subprocess.PIPE,
+                         shell=True)
+    infile, outfile, errfile = p.stdin, p.stdout, p.stderr
+
+    stdout_lines = outfile.readlines()
+    stderr_lines = errfile.readlines()
+    outfile.close()
+    infile.close()
+    errfile.close()
+
+    if stderr_lines:
+        return ("Unable to verify repository '%s'"
+                        ": %s" % (repo_dir, stderr_lines[0].rstrip()))
+
+    result = ''
+    for line in stdout_lines:
+        result += line.decode('cp1251').strip() + '\n'
+    #str_date = ' '.join(str_date[0:2])
+    return result # datetime.strptime(str_date, '%Y-%m-%d %H:%M:%S')
+
+def verify_repo(repo_dir):
+    return _verify(repo_dir)

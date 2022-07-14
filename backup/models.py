@@ -1,5 +1,7 @@
+from tkinter import DISABLED
 import arrow
 import os
+from enum import Enum, auto
 from datetime import datetime
 from django.core.exceptions import ValidationError
 from django_q.models import Schedule
@@ -10,11 +12,21 @@ from django.db import models
 MAX_PATH_LENGTH = 270*5
 
 
+class Status(Enum):
+    READY = auto()
+    RUNNING = auto()
+    DISABLED = auto()
+
+
+
 class Repository(models.Model):
     name = models.CharField(max_length=100, unique=True)
     path = models.CharField(max_length=MAX_PATH_LENGTH)
     modified = models.DateTimeField(
         'Modified time', default=None, blank=True, null=True)
+
+    class Meta:
+        ordering = ['modified']
 
     def clean(self):
         if not os.path.exists(self.path):
@@ -22,7 +34,10 @@ class Repository(models.Model):
                 f"Path doesn't exist {self.path}",)
 
     def __str__(self):
-        return f"{self.name} | {self.path} | {self.modified}"
+        modified = None
+        if self.modified:
+            modified = self.modified.strftime('%c')
+        return f"{self.name:<20} | {str(modified):>13}"
 
     def __repr__(self):
         return self.name
