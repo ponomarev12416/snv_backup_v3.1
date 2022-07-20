@@ -57,9 +57,13 @@ def update_repos_meta():
 
 
 def make_backups(*args):
-    start_job = time.time()
     job: Job = Job.objects.get(pk=args[0])
-    job.status = 'RUNNING'
+    if job.status == Job.DISABLED:
+        logger = logging.getLogger('backup')
+        logger.info('Job %s is skipped, since it was disabled.' % job.name)
+        return
+    start_job = time.time()
+    job.status = Job.READY
     job.save()
     job: Job = Job.objects.get(pk=args[0])
     repo_pathes = [rep.path for rep in job.repository.all()]
@@ -86,9 +90,10 @@ def make_backups(*args):
         track.save()
     job.last_run = datetime.now()
     job.time_elapsed = time_converter(time.time() - start_job)
-    if job.status == 'RUNNING':
-        print('SAVE STATUS')
-        job.status = 'READY'        
+    if job.run_only_once == True:
+        job.status = Job.DISABLED
+    elif job.status == Job.RUNNING:
+        job.status = Job.READY    
     job.save()
 
 

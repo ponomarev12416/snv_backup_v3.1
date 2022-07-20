@@ -1,4 +1,5 @@
 from email.headerregistry import Group
+from tkinter import DISABLED
 from django.contrib import admin
 from django.db import models as mdl
 from django.forms import TextInput, CheckboxSelectMultiple, SelectMultiple
@@ -11,6 +12,20 @@ from django_q.tasks import Chain
 from .models import Job, Report, Track, Repository
 from .utils import update_repos_meta, make_backups
 
+
+@admin.action(description='Switch to READY')
+def set_ready(modeladmin, request, queryset):
+    for job in queryset:
+        if job.status == Job.DISABLED:
+            job.status = Job.READY
+            job.save()
+
+@admin.action(description='Disable selected jobs')
+def disable_jobs(modeladmin, request, queryset):
+    for job in queryset:
+        if job.status != Job.DISABLED:
+            job.status = Job.DISABLED
+            job.save()
 
 
 @admin.action(description='Run selected jobs')
@@ -32,7 +47,7 @@ class JobAdmin(admin.ModelAdmin):
     model = Job
     exclude = ['status', 'last_run', 'schedule', 'time_elapsed']
     list_display = ('name', 'destination', 'status',
-                    'date_created', 'last_run', 'time_elapsed')
+                    'date_created', 'last_run', 'time_elapsed', 'run_only_once')
     
     formfield_overrides = {
         mdl.CharField: {'widget': TextInput(attrs={'size': '120'})},
@@ -44,7 +59,7 @@ class JobAdmin(admin.ModelAdmin):
     
 
     #inlines = [MembershipInline]
-    actions = [run_jobs]
+    actions = [run_jobs, disable_jobs, set_ready]
 
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)

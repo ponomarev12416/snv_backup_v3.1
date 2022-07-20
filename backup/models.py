@@ -18,7 +18,6 @@ class Status(Enum):
     DISABLED = auto()
 
 
-
 class Repository(models.Model):
     name = models.CharField(max_length=100, unique=True)
     path = models.CharField(max_length=MAX_PATH_LENGTH)
@@ -44,15 +43,26 @@ class Repository(models.Model):
 
 
 class Job(models.Model):
+    READY = 'READY'
+    RUNNING = 'RUNNING'
+    DISABLED = 'DISABLED'
+    STATUSES = [
+        (READY, 'READY'),
+        (RUNNING, 'RUNNING'),
+        (DISABLED, 'DISABLED'),
+    ]
 
     name = models.CharField(max_length=200, unique=True)
-    status = models.CharField(max_length=50, default='READY')
+    status = models.CharField(max_length=50, default=READY)
     last_run = models.CharField(max_length=200, default='')
     date_created = models.DateTimeField(
         'date created', auto_now_add=True, blank=True)
     destination = models.CharField(max_length=MAX_PATH_LENGTH)
 
     time = models.TimeField('time to start')
+    # If True, run only once no mater how many days were selected
+    run_only_once = models.BooleanField(default=False)
+
     monday = models.BooleanField()
     tuesday = models.BooleanField()
     wednesday = models.BooleanField()

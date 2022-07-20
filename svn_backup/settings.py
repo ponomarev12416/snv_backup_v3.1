@@ -174,6 +174,13 @@ LOGGING = {
             'filename': './error.log',
             'formatter': 'verbose'
         },
+        'backup_debug': {
+            'level': 'INFO',
+            #'filters': ['require_debug_true'],
+            'class': 'logging.FileHandler',
+            'filename': './backup.log',
+            'formatter': 'verbose'
+        },
     },
     'loggers': {
         'django': {
@@ -186,7 +193,7 @@ LOGGING = {
             'propagate': False,
         },
         'backup': {
-            'handlers': ['file_debug'],
+            'handlers': ['backup_debug'],
             'level': 'INFO',
             #'filters': ['special']
         }
