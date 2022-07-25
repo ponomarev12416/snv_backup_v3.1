@@ -1,24 +1,10 @@
-
 Wed Jul 13 13:59:16 2022
-Broken               
-Unable to verify repository 'D:\temp\source\path-1\source-big\run_animation': b"svnadmin: E720002: Can't open file 'D:\\temp\\source\\path-1\\source-big\\run_animation\\format': \xcd\xe5 \xf3\xe4\xe0\xe5\xf2\xf1\xff \xed\xe0\xe9\xf2\xe8 \xf3\xea\xe0\xe7\xe0\xed\xed\xfb\xe9 \xf4\xe0\xe9\xeb."
-aos-v4               
-Unable to verify repository 'C:\Users\vera\play-ground\dominigames\aos-v4': b"svnadmin: E720002: Can't open file 'C:\\Users\\vera\\play-ground\\dominigames\\aos-v4\\format': \xcd\xe5 \xf3\xe4\xe0\xe5\xf2\xf1\xff \xed\xe0\xe9\xf2\xe8 \xf3\xea\xe0\xe7\xe0\xed\xed\xfb\xe9 \xf4\xe0\xe9\xeb."
-celery               
-Unable to verify repository 'C:\Users\vera\play-ground\dominigames\celery': b"svnadmin: E720002: Can't open file 'C:\\Users\\vera\\play-ground\\dominigames\\celery\\format': \xcd\xe5 \xf3\xe4\xe0\xe5\xf2\xf1\xff \xed\xe0\xe9\xf2\xe8 \xf3\xea\xe0\xe7\xe0\xed\xed\xfb\xe9 \xf4\xe0\xe9\xeb."
-django-env           
-Unable to verify repository 'C:\Users\vera\play-ground\dominigames\django-env': b"svnadmin: E720002: Can't open file 'C:\\Users\\vera\\play-ground\\dominigames\\django-env\\format': \xcd\xe5 \xf3\xe4\xe0\xe5\xf2\xf1\xff \xed\xe0\xe9\xf2\xe8 \xf3\xea\xe0\xe7\xe0\xed\xed\xfb\xe9 \xf4\xe0\xe9\xeb."
-google_disk          
-Unable to verify repository 'C:\Users\vera\play-ground\dominigames\google_disk': b"svnadmin: E720002: Can't open file 'C:\\Users\\vera\\play-ground\\dominigames\\google_disk\\format': \xcd\xe5 \xf3\xe4\xe0\xe5\xf2\xf1\xff \xed\xe0\xe9\xf2\xe8 \xf3\xea\xe0\xe7\xe0\xed\xed\xfb\xe9 \xf4\xe0\xe9\xeb."
-svn-backup           
-Unable to verify repository 'C:\Users\vera\play-ground\dominigames\svn-backup': b"svnadmin: E720002: Can't open file 'C:\\Users\\vera\\play-ground\\dominigames\\svn-backup\\format': \xcd\xe5 \xf3\xe4\xe0\xe5\xf2\xf1\xff \xed\xe0\xe9\xf2\xe8 \xf3\xea\xe0\xe7\xe0\xed\xed\xfb\xe9 \xf4\xe0\xe9\xeb."
-svn-django-arc       
-Unable to verify repository 'C:\Users\vera\play-ground\dominigames\svn-django-arc': b"svnadmin: E720002: Can't open file 'C:\\Users\\vera\\play-ground\\dominigames\\svn-django-arc\\format': \xcd\xe5 \xf3\xe4\xe0\xe5\xf2\xf1\xff \xed\xe0\xe9\xf2\xe8 \xf3\xea\xe0\xe7\xe0\xed\xed\xfb\xe9 \xf4\xe0\xe9\xeb."
+
 rep-1-link           
 * Verifying metadata at revision 0 ...
 * Verified revision 0.
 
-repo-xxx-ooo-link    
+repo-2-link    
 * Verifying metadata at revision 0 ...
 * Verified revision 0.
 
